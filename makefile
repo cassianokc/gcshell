@@ -8,7 +8,7 @@ EXECUTABLE=gcshell
 all: $(SOURCES) $(EXECUTABLE)
 	
 $(EXECUTABLE): $(OBJECTS) 
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJECTS) -o $@
 
 .c:
 	$(CC) $(CFLAGS) $< -o $@
