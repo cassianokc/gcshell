@@ -14,7 +14,7 @@ const char *PATH;
 
 
 
-int parse_path(char *);
+int separate_string(const char *, char *, int, char);
 int file_exist(char *);
 
 

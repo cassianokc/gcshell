@@ -1,24 +1,24 @@
 #include "common.h"
 
-int parse_path(char *path_piece)
+int separate_string(const char *string_full, char *string_piece, int max, char delim)
 /* Separates the $PATH enviroment variable. */
 {
     static int count1 = 0;
     int count2=0;
-    while (PATH[count1] != ':' && count2<MAX_STRING)
+    while (string_full[count1] != delim && count2<max)
     {
         if (PATH[count1] == '\0')
         {
             count1 = 0;
-            path_piece[count2] = '\0';
+            string_piece[count2] = '\0';
             return FAILURE;
         }
-        path_piece[count2] = PATH[count1];
+        string_piece[count2] = string_full[count1];
         count1++;
         count2++;
     }
     count1++;
-    path_piece[count2] = '\0';
+    string_piece[count2] = '\0';
     return SUCESS;
 
 }
