@@ -1,13 +1,12 @@
 #include "common.h"
 
 int separate_string(const char *string_full, char *string_piece, int max, char delim)
-/* Separates the $PATH enviroment variable. */
 {
     static int count1 = 0;
     int count2=0;
     while (string_full[count1] != delim && count2<max)
     {
-        if (PATH[count1] == '\0')
+        if (string_full[count1] == '\0')
         {
             count1 = 0;
             string_piece[count2] = '\0';
