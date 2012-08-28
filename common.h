@@ -2,20 +2,29 @@
 #define COMMON_H
 
 #include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
 
 #define SUCESS 0
 #define FAILURE -1
 #define TRUE 1
 #define FALSE 0
-
 #define MAX_STRING 250
+#define fatal()                                       \
+        do { fprintf (stderr, "%s: %s: %d: %s: %s\n", \
+        argv[0], __FILE__, __LINE__,                  \
+        __PRETTY_FUNCTION__, strerror (errno));       \
+        exit (EXIT_FAILURE);} while (0)
 
 const char *PATH;
 
 
 
-int separate_string(const char *, char *, int, char);
+int read_word(const char *, char **, char);
+int count_words(const char *, char);
+
 int file_exist(char *);
 
 
 #endif
+

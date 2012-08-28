@@ -7,34 +7,41 @@
 
 int main(int argc, char **argv, char **env)
 {
-    char *input_string, input_piece[MAX_STRING];
-    size_t input_lenght;
-				    int pid = 0;
+    char *input_string = NULL, **input_arg = NULL;
+    size_t input_lenght = 0, input_words, count1;
+    int pid = 0;
     printf("$ ");
-    PATH = getenv("PATH");
-    while (getline(&input_string, &input_lenght, stdin) != FAILURE) 
-	{
-		input_string[strlen(input_string) - 1] = '\0';	/* Takes the \n from the string. */
-		char input_arg[50][50];
-		int count1=0;
-		while (separate_string(input_string, input_piece, MAX_STRING, ' ') == SUCESS)
-		{
-					strcpy(input_arg[count1], input_piece);
-					count1++;
-					printf("%s\n", input_piece);
 
+    while (getline(&input_string, &input_lenght, stdin) != FAILURE)
+    {
+        count1 = 0;
+        input_string[strlen(input_string) - 1] = '\0'; /* Takes the \n from the string. */
+        input_words = count_words(input_string, ' ');
+        input_arg = (char **) malloc((input_words + 1) * sizeof (char *));
+        input_arg[input_words] = NULL;
+        while (read_word(input_string, &input_arg[count1], ' ') == SUCESS)
+        {
+            
+            count1++;
+        }
 
-		}
-if (pid == -1)
-						exit(EXIT_FAILURE);
-		  		    if (pid != 0)
-						wait();
-				    else 
-					{
-						execvp(argv[0], argv);
-				    }
-		printf("$ ");
+        pid = fork();
+        if (pid == -1)
+            fatal();
+        if (pid != 0)
+        {
+            wait();
+            for (count1 = 0; count1 < input_words; count1++)
+                free(input_arg[count1]);
+            free(input_arg);
+        }
+        else
+        {
+            execvp(input_arg[0], input_arg);
+        }
+        printf("$ ");
     }
+    free(input_string);
     return EXIT_SUCCESS;
 }
 
@@ -42,7 +49,7 @@ int file_exist(char *filename)
 {
     FILE *f = fopen(filename, "r");
     if (!f)
-	return FALSE;
+        return FALSE;
     fclose(f);
     return TRUE;
 }
