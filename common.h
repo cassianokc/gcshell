@@ -10,14 +10,15 @@
 #define TRUE 1
 #define FALSE 0
 #define MAX_STRING 250
-#define fatal()                                       \
-        do { fprintf (stderr, "%s: %s: %d: %s: %s\n", \
-        argv[0], __FILE__, __LINE__,                  \
-        __PRETTY_FUNCTION__, strerror (errno));       \
+#define fatal()                                          \
+        do { fprintf (stderr, "Error: %s: %d: %s: %s\n", \
+         __FILE__, __LINE__,                             \
+        __PRETTY_FUNCTION__, strerror (errno));          \
         exit (EXIT_FAILURE);} while (0)
 
-const char *PATH;
 
+
+const char *PATH;
 
 
 int read_word(const char *, char **, char);

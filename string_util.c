@@ -2,7 +2,7 @@
 
 int read_word(const char *string_full, char **string_piece, char delim)
 {
-    static int count1 = 0;
+    static size_t count1 = 0;
     int count2 = 0, word_lenght = 0;
     while (string_full[word_lenght] != delim && string_full[word_lenght] != '\0')
     {
@@ -31,7 +31,7 @@ int read_word(const char *string_full, char **string_piece, char delim)
 
 int count_words(const char *string, char delim)
 {
-    int count1 = 0;
+    size_t count1 = 0;
     int delim_count = 1;
     while (string[count1] != '\0')
     {
@@ -45,4 +45,6 @@ int count_words(const char *string, char delim)
     }
     return delim_count;
 }
+
+
 
