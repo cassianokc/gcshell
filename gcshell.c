@@ -1,9 +1,15 @@
+/**
+ * Students:
+ * Cassiano Kleinert Casagrande 7152819
+ * Gustavo Livrare Martins 7277687
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 
 #include "common.h"
@@ -11,6 +17,7 @@
 int main(int argc, char **argv)
 {
     char *input_string = NULL;
+
     size_t input_lenght, count1;
     for (count1=0; count1<argc; count1++) /* Checks for shell call parameters. */
     {
@@ -51,15 +58,15 @@ void process_string(char *input_string)
         count1++;
     }
     /* Check for built-in commands, if found, execute it, frees input_arg and return to main loop.*/
-    if (strcmp(input_arg[count1], "cd") == 0 && input_words >= 2)
+    if (strcmp(input_arg[0], "cd") == 0 && input_words >= 2)
     {
         chdir(input_arg[1]);
-        free_input_args(input_arg, input_words);
+        free_pointer_to_pointers(input_arg, input_words);
         return;
     }
-    if (strcmp(input_arg[count1], "exit") == 0)
+    if (strcmp(input_arg[0], "exit") == 0)
     {
-        free_input_args(input_arg, input_words);
+        free_pointer_to_pointers(input_arg, input_words);
         free(input_string);
         exit(EXIT_SUCCESS);
     }
@@ -68,8 +75,9 @@ void process_string(char *input_string)
         fatal();
     if (pid != 0)
     {
-        wait();
-        free_input_args(input_arg, input_words);
+        int status;
+        wait(&status);
+        free_pointer_to_pointers(input_arg, input_words);
         return;
     }
     else
@@ -117,16 +125,18 @@ void process_string(char *input_string)
         }
 
         execvp(input_arg[0], input_arg);
+        printf("Command not found: %s\n", input_arg[0]);  /* Execvp didn't executed correctly. */
+        exit(EXIT_FAILURE);
     }
 }
 
-void free_input_args(char **arg, int n)
-/**/
+void free_pointer_to_pointers(char **p, int n)
+/* Frees all pointers in p[0], p[1]..., p[n-1], then frees p. */
 {
     size_t count1;
     for (count1 = 0; count1 < n; count1++)
     {
-        free(arg[count1]);
+        free(p[count1]);
     }
-    free(arg);
+    free(p);
 }

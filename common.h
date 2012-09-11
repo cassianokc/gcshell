@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <errno.h>
 
+
 #define SUCESS 0
 #define FAILURE -1
 #define TRUE 1
@@ -24,7 +25,9 @@ const char *PATH;
 int read_word(const char *, char **, char);
 int count_words(const char *, char);
 
-int file_exist(char *);
+void process_string(char *);
+void free_pointer_to_pointers(char **, int);
+
 
 
 #endif

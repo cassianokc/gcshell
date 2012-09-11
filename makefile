@@ -1,5 +1,6 @@
 CC=gcc
-CFLAGS=-ansi -Wall -o3 -march=native
+CFLAGS=-std=c99 -Wall -o3 -march=native -D_GNU_SOURCE
+
 LDFLAGS=
 SOURCES=*.c
 OBJECTS=$(SOURCES:.cpp=.o)
