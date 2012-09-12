@@ -118,7 +118,7 @@ void process_string(char *input_string)
                   input_arg[count1] =  NULL;
                   count1++;
                   close(0);
-                  fd = open(input_arg[count1], O_CREAT | O_TRUNC | O_RDWR,  S_IRUSR | S_IWUSR);
+                  fd = open(input_arg[count1], O_RDWR,  S_IRUSR | S_IWUSR);
                   if (fd < 0)
                   {
                       fatal();
