@@ -23,10 +23,13 @@ int main(int argc, char **argv)
     {
         if (strcmp(argv[count1], "--help") == 0)
         {
-            printf("%s %s %s\n %s\n", "A simple shell made by Gustavo Livrare Martins(my colleague)",
-                "and Cassiano Kleinert Casagrande(me! =D) for the Operating Systems II course,",
-                "in Universidade de São Paulo.",
-                "Built-in commands are exit and cd.");
+            FILE *readme = fopen("README", "r");
+			char *read_string;
+			if (readme == NULL)
+				printf("Couldn't find README.\n");
+			while (getline(&read_string, &input_lenght, readme) != FAILURE)
+				printf("%s", read_string);
+			fclose(readme);
         }
     }
     printf("$ ");
@@ -69,6 +72,19 @@ void process_string(char *input_string)
         free_pointer_to_pointers(input_arg, input_words);
         free(input_string);
         exit(EXIT_SUCCESS);
+    }
+    if (strcmp(input_arg[0], "help") == 0)
+    {
+        FILE *readme = fopen("README", "r");
+		char *read_string;
+		size_t read_lenght;
+		if (readme == NULL)
+			printf("Couldn't find README.\n");
+		while (getline(&read_string, &read_lenght, readme) != FAILURE)
+			printf("%s", read_string);
+		free_pointer_to_pointers(input_arg, input_words);
+		fclose(readme);
+		return;
     }
     pid = fork();
     if (pid == -1)

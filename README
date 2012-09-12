@@ -8,5 +8,5 @@ How to compile:
 $make
 $./gcshell
 =======
-For info, use ./gcshell --help.
+For info, use ./gcshell --help, or use the built-in command prompt.
 To exit program, send EOF(^d) or enter exit on prompt.
