@@ -24,12 +24,16 @@ int main(int argc, char **argv)
         if (strcmp(argv[count1], "--help") == 0)
         {
             FILE *readme = fopen("README", "r");
-			char *read_string;
-			if (readme == NULL)
+			char *read_string = NULL;
+			size_t input_lenght;
+			if (readme != NULL)
+			{
+				while (getline(&read_string, &input_lenght, readme) != FAILURE)
+					printf("%s", read_string);
+				fclose(readme);
+			}
+			else
 				printf("Couldn't find README.\n");
-			while (getline(&read_string, &input_lenght, readme) != FAILURE)
-				printf("%s", read_string);
-			fclose(readme);
         }
     }
     printf("$ ");
@@ -76,14 +80,17 @@ void process_string(char *input_string)
     if (strcmp(input_arg[0], "help") == 0)
     {
         FILE *readme = fopen("README", "r");
-		char *read_string;
-		size_t read_lenght;
-		if (readme == NULL)
-			printf("Couldn't find README.\n");
-		while (getline(&read_string, &read_lenght, readme) != FAILURE)
-			printf("%s", read_string);
-		free_pointer_to_pointers(input_arg, input_words);
-		fclose(readme);
+			char *read_string = NULL;
+			size_t input_lenght;
+			if (readme != NULL)
+			{
+				while (getline(&read_string, &input_lenght, readme) != FAILURE)
+					printf("%s", read_string);
+				fclose(readme);
+				free_pointer_to_pointers(input_arg, input_words);
+			}
+			else
+				printf("Couldn't find README.\n");
 		return;
     }
     pid = fork();
