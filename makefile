@@ -1,15 +1,17 @@
-CC=gcc
-CFLAGS=-std=c99 -Wall -o3 -march=native -D_GNU_SOURCE
+$CC=gcc
+$CFLAGS=-ansi -Wall -march=NATIVE -o3 -D_GNU_SOURCE
 
-LDFLAGS=
-SOURCES=*.c
-OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=gcshell
+all: gcshell
+	rm -f *~ *.o
 
-all: $(SOURCES) $(EXECUTABLE)
-	
-$(EXECUTABLE): $(OBJECTS) 
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJECTS) -o $@
+gcshell: gcshell.o string_util.o
+	$(CC) gcshell.o string_util.o -o gcshell
 
-.c:
-	$(CC) $(CFLAGS) $< -o $@
+gcshell.o: gcshell.c common.h
+	$(CC) $(CFLAGS) -c gcshell.c
+
+string_util.o: string_util.c common.h
+	$(CC) $(CFLAGS) -c string_util.c
+
+clean:
+	rm -f ~* *.o
