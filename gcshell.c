@@ -114,94 +114,65 @@ process_string (char *input_string)
     }
   else
     {
-      for (count1 = 0; count1 < input_words; count1++)
-	{
-	  if (strcmp (input_arg[count1], ">") == 0)
-	    {
-	      int fd;
-	      input_arg[count1] = NULL;
-	      count1++;
-	      close (1);
-	      fd = open (input_arg[count1], O_CREAT | O_TRUNC | O_RDWR,
-			 S_IRUSR | S_IWUSR);
-	      if (fd < 0)
-		{
-		  fatal ();
-		}
-	    }
-	  if (strcmp (input_arg[count1], "<") == 0)
-	    {
-	      int fd;
-	      input_arg[count1] = NULL;
-	      count1++;
-	      close (0);
-	      fd = open (input_arg[count1], O_RDWR, S_IRUSR | S_IWUSR);
-	      if (fd < 0)
-		{
-		  fatal ();
-		}
-
-	    }
-	  if (strcmp (input_arg[count1], ">>") == 0)
-	    {
-	      int fd;
-	      input_arg[count1] = NULL;
-	      count1++;
-	      close (1);
-	      fd = open (input_arg[count1], O_CREAT | O_APPEND | O_RDWR,
-			 S_IRUSR | S_IWUSR);
-	      if (fd < 0)
-		    {
-		  fatal ();
-	    	}
-
-	    }
-	}
-
-      execvp (input_arg[0], input_arg);
-      printf ("Command not found: %s\n", input_arg[0]);	/* Execvp didn't executed correctly. */
-      exit (EXIT_FAILURE);
+      execute(input_arg, input_words);
     }
 }
 
 void
 execute (char **arg, size_t words)
 {
-  for (count1 = 0; count1 < input_words; count1++)
+  int count1;
+  for (count1 = 0; count1 < words; count1++)
     {
-      if (strcmp (input_arg[count1], ">") == 0)
+      if (strcmp (arg[count1], "|") == 0)
+      {
+	int pid;
+	arg[count1] =  NULL;
+	pid = fork();
+	if (pid == -1)
+	    fatal();
+	if (pid != 0)
+	{
+	  
+	}
+	else
+	{
+	  
+	}
+      }
+      if (strcmp (arg[count1], ">") == 0)
 	{
 	  int fd;
-	  input_arg[count1] = NULL;
+	  arg[count1] = NULL;
 	  count1++;
 	  close (1);
-	  fd = open (input_arg[count1], O_CREAT | O_TRUNC | O_RDWR,
+	  fd = open (arg[count1], O_CREAT | O_TRUNC | O_RDWR,
 		     S_IRUSR | S_IWUSR);
 	  if (fd < 0)
 	    {
 	      fatal ();
 	    }
 	}
-      if (strcmp (input_arg[count1], "<") == 0)
+      if (strcmp (arg[count1], "<") == 0)
 	{
 	  int fd;
-	  input_arg[count1] = NULL;
+	  arg[count1] = NULL;
 	  count1++;
 	  close (0);
-	  fd = open (input_arg[count1], O_RDWR, S_IRUSR | S_IWUSR);
+	  fd = open (arg[count1], O_RDWR, S_IRUSR | S_IWUSR);
 	  if (fd < 0)
 	    {
 	      fatal ();
 	    }
 
 	}
-      if (strcmp (input_arg[count1], ">>") == 0)
+      if (strcmp (arg[count1], ">>") == 0)
 	{
 	  int fd;
-	  input_arg[count1] = NULL;
+	  arg[count1] = NULL;
 	  count1++;
 	  close (1);
-	  fd = open (input_arg[count1], O_CREAT | O_APPEND | O_RDWR,
+	  fd = open (arg[count1], O_CREAT | O_APPEND | O_RDWR,
 		     S_IRUSR | S_IWUSR);
 	  if (fd < 0)
 	    {
@@ -211,10 +182,9 @@ execute (char **arg, size_t words)
 	}
     }
 
-  execvp (input_arg[0], input_arg);
-  printf ("Command not found: %s\n", input_arg[0]);	/* Execvp didn't executed correctly. */
+  execvp (arg[0], arg);
+  printf ("Command not found: %s\n", arg[0]);	/* Execvp didn't executed correctly. */
   exit (EXIT_FAILURE);
-}
 }
 
 void
