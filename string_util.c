@@ -13,7 +13,7 @@ read_word (const char *string_full, char **string_piece, char delim)
   *string_piece = malloc (word_lenght * sizeof (char));
   if ((*string_piece) == NULL)
     {
-      fatal ();
+      fatal();
     }
   while (string_full[count1] != delim)
     {
