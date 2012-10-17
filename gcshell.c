@@ -115,17 +115,19 @@ execute(char **arg, size_t words) {
             pid = fork();
             if (pid == -1)
                 fatal();
-            if (pid != 0) {
+            if (pid == 0) {
                 int status;
-                wait(&status);
                 close(STDIN_DESC);
                 dup(pipefd[0]);
+		close(pipefd[0]);
+		close(pipefd[1]);
                 execute(arg + count1, words - count1);
                 return;
             } else {
-                close(1);
+                close(STDOUT_DESC);
                 dup(pipefd[1]);
                 close(pipefd[1]);
+		close(pipefd[0]);
                 break;
             }
         }
@@ -164,7 +166,8 @@ execute(char **arg, size_t words) {
 
         }
     }
-    printf("vai chamar %s\n", arg[0]);
+    fprintf(stderr, "vai chamar %s\n", arg[0]);
+    fflush(stdout);
     execvp(arg[0], arg);
     printf("Command not found: %s\n", arg[0]); /* Execvp didn't executed correctly. */
     exit(EXIT_FAILURE);
