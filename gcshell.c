@@ -35,7 +35,6 @@ main(int argc, char **argv) {
         }
     }
     printf("$ ");
-
     while (getline(&input_string, &input_lenght, stdin) != FAILURE) { /* Reads user input from stdin. */
         process_string(input_string);
         printf("$ ");
@@ -91,7 +90,7 @@ process_string(char *input_string)
     pid = fork();
     if (pid == -1)
         fatal();
-    if (pid != 0) {
+    if (pid != 0) { /* If parent. */
         int status;
         wait(&status);
         free_pointer_to_pointers(input_arg, input_words);
@@ -103,32 +102,35 @@ process_string(char *input_string)
 
 void
 execute(char **arg, size_t words) {
+    /* Searches for redirections and pipes in the arg list, treats them and then executes
+     the prompt. */
     int count1;
     for (count1 = 0; count1 < words; count1++) {
-        if (strcmp(arg[count1], "|") == 0) {
+        if (strcmp(arg[count1], "|") == 0) { /* Case found a pipe. */
             int pid;
             int pipefd[2];
             arg[count1] = NULL;
             count1++;
             if (pipe(pipefd) < 0)
                 fatal();
-            pid = fork();
+            pid = fork(); /* Fork. */
             if (pid == -1)
                 fatal();
-            if (pid == 0) {
-                int status;
-                close(STDIN_DESC);
-                dup(pipefd[0]);
-		close(pipefd[0]);
-		close(pipefd[1]);
-                execute(arg + count1, words - count1);
-                return;
-            } else {
-                close(STDOUT_DESC);
+            if (pid == 0) { /* If child. */
+                close(STDOUT_DESC); /* Redirect input and breaks to execute the first command. */
                 dup(pipefd[1]);
                 close(pipefd[1]);
-		close(pipefd[0]);
+                close(pipefd[0]);
                 break;
+
+            } else { /* If parent. */
+                int status;
+                close(STDIN_DESC); /* Redirects output and execute the command after pipe. */
+                dup(pipefd[0]);
+                close(pipefd[0]);
+                close(pipefd[1]);
+                execute(arg + count1, words - count1);
+                return;
             }
         }
         if (strcmp(arg[count1], ">") == 0) {
@@ -166,8 +168,6 @@ execute(char **arg, size_t words) {
 
         }
     }
-    fprintf(stderr, "vai chamar %s\n", arg[0]);
-    fflush(stdout);
     execvp(arg[0], arg);
     printf("Command not found: %s\n", arg[0]); /* Execvp didn't executed correctly. */
     exit(EXIT_FAILURE);

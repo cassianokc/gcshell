@@ -25,12 +25,12 @@
 const char *PATH;
 
 
-int read_word (const char *, char **, char);
-int count_words (const char *, char);
+int read_word(const char *, char **, char);
+int count_words(const char *, char);
 
-void process_string (char *);
-void free_pointer_to_pointers (char **, int);
-void execute (char **, size_t);
+void process_string(char *);
+void free_pointer_to_pointers(char **, int);
+void execute(char **, size_t);
 
 
 
