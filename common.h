@@ -17,9 +17,8 @@
         __PRETTY_FUNCTION__, strerror (errno));          \
         exit (EXIT_FAILURE);} while (0)
 
-
-#define STDIN_DESC 0
 #define STDOUT_DESC 1
+#define STDIN_DESC 0
 
 
 const char *PATH;

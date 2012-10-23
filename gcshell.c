@@ -137,7 +137,7 @@ execute(char **arg, size_t words) {
             int fd;
             arg[count1] = NULL;
             count1++;
-            close(1);
+            close(STDOUT_DESC);
             fd = open(arg[count1], O_CREAT | O_TRUNC | O_RDWR,
                     S_IRUSR | S_IWUSR);
             if (fd < 0) {
@@ -148,7 +148,7 @@ execute(char **arg, size_t words) {
             int fd;
             arg[count1] = NULL;
             count1++;
-            close(0);
+            close(STDIN_DESC);
             fd = open(arg[count1], O_RDWR, S_IRUSR | S_IWUSR);
             if (fd < 0) {
                 fatal();
@@ -159,7 +159,7 @@ execute(char **arg, size_t words) {
             int fd;
             arg[count1] = NULL;
             count1++;
-            close(1);
+            close(STDOUT_DESC);
             fd = open(arg[count1], O_CREAT | O_APPEND | O_RDWR,
                     S_IRUSR | S_IWUSR);
             if (fd < 0) {
