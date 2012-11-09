@@ -1,14 +1,20 @@
-== == == =
-  Cassiano Kleinert Casagrande 7152819
-  Gustavo Livrare Martins 7277687
-  == == == = A simple shell made by Gustavo Livrare Martins (my colleague)
-     and Cassiano Kleinert
-Casagrande (me ! = D) for the
+=======
+Cassiano Kleinert Casagrande 7152819
+Gustavo Livrare Martins 7277687
+=======
+A simple shell made by Gustavo Livrare Martins(my colleague) and Cassiano Kleinert Casagrande(me! =D) for the Operating Systems II course, in Universidade de São Paulo. 
+=======
+How to compile:
+$make
+$./gcshell
+=======
+Builtin Commands:
+help
+cd $directory
+jobs
+fg
+bg 
+=======
+Shell call command
+--help
 
-     $make
-    $. / gcshell
-    == == == =
-    For info, use. / gcshell-- help,
-    or use the built - in command prompt.To exit program,
-    send EOF (^d) or enter exit on
-       prompt.

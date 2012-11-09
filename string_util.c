@@ -1,7 +1,9 @@
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "common.h"
 
-int
-read_word(const char *string_full, char **string_piece, char delim) {
+int read_word(const char *string_full, char **string_piece, char delim) {
     static size_t count1 = 0;
     int count2 = 0, word_lenght = 0;
     while (string_full[word_lenght] != delim

@@ -31,6 +31,11 @@ void process_string(char *);
 void free_pointer_to_pointers(char **, int);
 void execute(char **, size_t);
 
+int check_builtin(char **, size_t);
+void help(void);
+
+
+
 
 
 #endif
