@@ -17,9 +17,12 @@
 #include "common.h"
 
 int main(int argc, char **argv) {
-    char *input_string = NULL;
-
-    size_t input_lenght, count1;
+    int count1;
+    char *input_string;
+    size_t input_lenght;
+    struct JOB *cur_job;
+    input_string = NULL;
+    cur_job = NULL;
     for (count1 = 0; count1 < argc; count1++) { /* Checks for shell call parameters. */
         if (strcmp(argv[count1], "--help") == 0) {
             help();
@@ -27,7 +30,11 @@ int main(int argc, char **argv) {
     }
     printf("$ ");
     while (getline(&input_string, &input_lenght, stdin) != FAILURE) { /* Reads user input from stdin. */
-        process_string(input_string);
+        input_string[strlen(input_string) - 1] = '\0'; /* Takes the \n from the string. */
+        string_to_job(input_string, &cur_job);
+        print_jobs(cur_job);
+        process_job(cur_job);
+        delete_jobs(&cur_job);
         printf("$ ");
 
     }
@@ -35,27 +42,14 @@ int main(int argc, char **argv) {
     return EXIT_SUCCESS;
 }
 
-void process_string(char *input_string)
+void process_job(struct JOB *j)
 /* Counts number of words in input_string, then allocates **argv, after that, tests if the
  * input command is builted in the shell, else forks and  execute the program called. 
  */ {
-    char **input_arg = NULL;
-    size_t input_words, count1;
-    int pid = 0;
-    count1 = 0;
-    input_string[strlen(input_string) - 1] = '\0'; /* Takes the \n from the string. */
-    input_words = count_words(input_string, ' ');
-    input_arg = (char **) malloc((input_words + 1) * sizeof (char *));
-    if (input_arg == NULL) {
-        fatal();
-    }
-    input_arg[input_words] = NULL;
-    while (read_word(input_string, &input_arg[count1], ' ') == SUCESS) {
-
-        count1++;
-    }
+    int pid;
+    pid = 0;
     /* Check for built-in commands, if found, execute it, frees input_arg and return to main loop. */
-    if (check_builtin(input_arg, input_words) == SUCESS)
+    if (check_builtin(j) == SUCCESS)
         return;
     pid = fork();
     if (pid == -1)
@@ -63,18 +57,17 @@ void process_string(char *input_string)
     if (pid != 0) { /* If parent. */
         int status;
         wait(&status);
-        free_pointer_to_pointers(input_arg, input_words);
         return;
     } else {
-        execute(input_arg, input_words);
+        execute(j->arg_strings, j->num_args);
     }
 }
 
-void execute(char **arg, size_t words) {
+void execute(char **arg, int words) {
     /* Searches for redirections and pipes in the arg list, treats them and then executes
      the prompt. */
     int count1;
-    for (count1 = 0; count1 < words; count1++) {
+    for (count1 = 0; count1 < words-1; count1++) {
         if (strcmp(arg[count1], "|") == 0) { /* Case found a pipe. */
             int pid;
             int pipefd[2];
@@ -141,11 +134,3 @@ void execute(char **arg, size_t words) {
     exit(EXIT_FAILURE);
 }
 
-void free_pointer_to_pointers(char **p, int n)
-/* Frees all pointers in p[0], p[1]..., p[n-1], then frees p. */ {
-    size_t count1;
-    for (count1 = 0; count1 < n; count1++) {
-        free(p[count1]);
-    }
-    free(p);
-}

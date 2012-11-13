@@ -1,11 +1,11 @@
 CC=gcc
-CFLAGS=-ansi -Wall -D_GNU_SOURCE
+CFLAGS=-std=c99 -Wall -D_GNU_SOURCE
 
 all: gcshell
 	rm -f *~ *.o
-
-gcshell: gcshell.o string_util.o builtin.o
-	$(CC) gcshell.o string_util.o builtin.o -o gcshell
+	
+gcshell: gcshell.o jobs.o builtin.o jobs.o
+	$(CC) gcshell.o builtin.o jobs.o -o gcshell
 	
 gcshell.o: gcshell.c common.h
 	$(CC) $(CFLAGS) -c gcshell.c
@@ -13,8 +13,9 @@ gcshell.o: gcshell.c common.h
 builtin.o: builtin.c common.h
 	$(CC) $(CFLAGS) -c builtin.c
 
-string_util.o: string_util.c common.h
-	$(CC) $(CFLAGS) -c string_util.c
+jobs.o: jobs.c common.h
+	$(CC) $(CFLAGS) -c jobs.c
+	
 
 clean:
 	rm -f *~ *.o gcshell

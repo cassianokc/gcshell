@@ -6,7 +6,7 @@
 #include <errno.h>
 
 
-#define SUCESS 0
+#define SUCCESS 0
 #define FAILURE -1
 #define TRUE 1
 #define FALSE 0
@@ -21,17 +21,23 @@
 #define STDIN_DESC 0
 
 
-const char *PATH;
+struct JOB {
+    struct JOB *next_job;
+    char **arg_strings;
+    int num_args;
+    char IS_FOREGROUND_FLAG;
+    char IS_RUNNING_FLAG;
+};
 
-
-int read_word(const char *, char **, char);
-int count_words(const char *, char);
-
-void process_string(char *);
-void free_pointer_to_pointers(char **, int);
-void execute(char **, size_t);
-
-int check_builtin(char **, size_t);
+int string_to_job(char *, struct JOB **);
+int is_running(struct JOB *);
+int is_foreground(struct JOB *);
+int add_job(struct JOB **, struct JOB *);
+void delete_jobs(struct JOB **);
+void print_jobs(struct JOB *);
+void process_job(struct JOB *);
+void execute(char **, int);
+int check_builtin(struct JOB *);
 void help(void);
 
 
