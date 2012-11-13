@@ -4,41 +4,42 @@
 #include <unistd.h>
 #include "common.h"
 
-/* Checks args for builtin functions and executes them. */
+/* Checks job->arg_stringss for builtin functions and executes them. */
 int check_builtin(struct JOB *job)
 {
-    /*if (strcmp(arg[0], "cd") == 0 && size >= 2) {
-	chdir(arg[1]);
-	free_pointer_to_pointers(arg, size);
+    if (strcmp(job->arg_strings[0], "cd") == 0 && job->num_args >= 2) {
+	chdir(job->arg_strings[1]);
+	delete_jobs(&job);
 	return SUCCESS;
     }
-    if (strcmp(arg[0], "exit") == 0) {
-	free_pointer_to_pointers(arg, size);
+    if (strcmp(job->arg_strings[0], "exit") == 0) {
+	delete_jobs(&job);
 	exit(EXIT_SUCCESS);
     }
-    if (strcmp(arg[0], "help") == 0) {
+    if (strcmp(job->arg_strings[0], "help") == 0) {
 	help();
-	free_pointer_to_pointers(arg, size);
+	delete_jobs(&job);
 	return SUCCESS;
     }
-    if (strcmp(arg[0], "jobs") == 0) {
+    if (strcmp(job->arg_strings[0], "jobs") == 0) {
 	help();
-	free_pointer_to_pointers(arg, size);
+	delete_jobs(&job);
 	return SUCCESS;
     }
-    if (strcmp(arg[0], "bg") == 0) {
+    if (strcmp(job->arg_strings[0], "bg") == 0) {
 	help();
-	free_pointer_to_pointers(arg, size);
+	delete_jobs(&job);
 	return SUCCESS;
     }
-    if (strcmp(arg[0], "fg") == 0) {
+    if (strcmp(job->arg_strings[0], "fg") == 0) {
 	help();
-	free_pointer_to_pointers(arg, size);
+	delete_jobs(&job);
 	return SUCCESS;
-    }*/
+    }
     return FAILURE;
 }
 
+/* Opens the README file and prints it on the screen.*/
 void help(void)
 {
     FILE *readme = fopen("README", "r");

@@ -20,7 +20,9 @@
 #define STDOUT_DESC 1
 #define STDIN_DESC 0
 
-
+/* JOB structure, implemented as a linked list, where new members
+ are added on the beginning of the list, contains flags indicating the state of 
+ the job and the args used to create the job.*/
 struct JOB {
     struct JOB *next_job;
     char **arg_strings;
