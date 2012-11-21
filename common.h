@@ -29,6 +29,7 @@ struct JOB {
     int num_args;
     char IS_FOREGROUND_FLAG;
     char IS_RUNNING_FLAG;
+    int pid;
 };
 
 int string_to_job(char *, struct JOB **);
@@ -37,10 +38,15 @@ int is_foreground(struct JOB *);
 int add_job(struct JOB **, struct JOB *);
 void delete_jobs(struct JOB **);
 void print_jobs(struct JOB *);
-void process_job(struct JOB *);
+void process_job();
 void execute(char **, int);
-int check_builtin(struct JOB *);
+int check_builtin();
 void help(void);
+
+void set_signals(void);
+void dfl_signals(void);
+void redirect_sigtstp(int p);
+void redirect_sigint(int p);
 
 
 

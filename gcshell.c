@@ -13,29 +13,34 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+#include <setjmp.h>
 
 #include "common.h"
+
+struct JOB *jobs_list;
+struct JOB *cur_job;
+jmp_buf sjbuf;
+
 
 int main(int argc, char **argv) {
     int count1;
     char *input_string;
     size_t input_lenght;
-    struct JOB *cur_job;
     input_string = NULL;
     cur_job = NULL;
+    set_signals();
     for (count1 = 0; count1 < argc; count1++) { // Checks for shell call parameters.
         if (strcmp(argv[count1], "--help") == 0) {
             help();
         }
     }
     printf("$ ");
-    while (getline(&input_string, &input_lenght, stdin) != FAILURE) {
+    while (getlin(&input_string, &input_lenght, stdin) != FAILURE || !feof(stdin)) {
         input_string[strlen(input_string) - 1] = '\0'; //Takes the \n from the string end. 
         string_to_job(input_string, &cur_job); // Converts string to a job structure
-        process_job(cur_job); // Process the input job.
+        process_job(); // Process the input job.
         delete_jobs(&cur_job); // Deletes it
         printf("$ "); // Prompts user for another input.
-
     }
     free(input_string);
     return EXIT_SUCCESS;
@@ -43,28 +48,40 @@ int main(int argc, char **argv) {
 
 /* Forks the shell process and makes it wait while the child process executes the
 job passed. */
-void process_job(struct JOB *j) {
+void process_job() {
     int pid;
     pid = 0;
     // Check for built-in commands, if found, execute it, frees input_arg and return to main loop
-    if (check_builtin(j) == SUCCESS)
+    if (check_builtin() == SUCCESS)
         return;
+    if (strcmp(cur_job->arg_strings[cur_job->num_args - 2], "&") == 0) {
+        cur_job->IS_FOREGROUND_FLAG = TRUE;
+        free(cur_job->arg_strings[cur_job->num_args - 2]);
+        cur_job->arg_strings[cur_job->num_args - 2] = NULL;
+        add_job(&jobs_list, cur_job);
+    }
     pid = fork();
     if (pid == -1)
-        fatal();
+        if (cur_job->IS_FOREGROUND_FLAG)
+            fatal();
     if (pid != 0) { // If parent
         int status;
-        wait(&status);
+        cur_job->pid = pid;
+        if (is_foreground(cur_job))
+            wait(&status);
         return;
     } else {
-        execute(j->arg_strings, j->num_args);
+        execute(cur_job->arg_strings, cur_job->num_args);
     }
 }
 
 /* Searches for redirections and pipes in the arg list, treats them and then executes
-the prompt. */
+the prompt.*/
 void execute(char **arg, int words) {
     int count1;
+    if (is_foreground(cur_job)) {
+
+    }
     for (count1 = 0; count1 < words - 1; count1++) {
         if (strcmp(arg[count1], "|") == 0) { // Case found a pipe
             int pid;
@@ -115,7 +132,7 @@ void execute(char **arg, int words) {
             }
 
         }
-        if (strcmp(arg[count1], ">>") == 0) { 
+        if (strcmp(arg[count1], ">>") == 0) {
             int fd;
             arg[count1] = NULL;
             count1++;
@@ -125,7 +142,6 @@ void execute(char **arg, int words) {
             if (fd < 0) {
                 fatal();
             }
-
         }
     }
     execvp(arg[0], arg);

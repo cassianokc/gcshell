@@ -17,3 +17,9 @@ common.h
 
 
 ========
+
+
+Signals:
+Ctrl-Z = SIGTSTP
+Ctrl-C = SIGINT
+Child death = SIGCHILD
