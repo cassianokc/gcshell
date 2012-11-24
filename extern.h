@@ -6,7 +6,6 @@
 
 extern struct JOB *jobs_list;
 extern struct JOB *cur_job;
-extern jmp_buf sjbuf;
 
 
 #endif

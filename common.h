@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/signal.h>
 #include <errno.h>
 
 
@@ -29,7 +30,7 @@ struct JOB {
     int num_args;
     char IS_FOREGROUND_FLAG;
     char IS_RUNNING_FLAG;
-    int pid;
+    pid_t pid;
 };
 
 int string_to_job(char *, struct JOB **);
@@ -38,6 +39,9 @@ int is_foreground(struct JOB *);
 int add_job(struct JOB **, struct JOB *);
 void delete_jobs(struct JOB **);
 void print_jobs(struct JOB *);
+struct JOB *wake_job(struct JOB **, int); 
+int job_exists(struct JOB *, struct JOB *);
+int read_string(char **, size_t *, FILE *);
 void process_job();
 void execute(char **, int);
 int check_builtin();
@@ -45,8 +49,9 @@ void help(void);
 
 void set_signals(void);
 void dfl_signals(void);
-void redirect_sigtstp(int p);
-void redirect_sigint(int p);
+void handle_sigtstp(int);
+void handle_sigint(int);
+void handle_sigchld(int, siginfo_t *, void *);
 
 
 

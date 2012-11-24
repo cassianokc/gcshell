@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-std=c99 -Wall -D_GNU_SOURCE
+CFLAGS=-Wall
 
 all: gcshell
 	rm -f *~ *.o

@@ -5,11 +5,16 @@ gcshell.c
 
 
 ========
-string_util.c
+builtin.c
 
 
 ========
-builtin.c
+jobs.c
+
+
+========
+signal.c
+
 
 
 ========
@@ -17,9 +22,10 @@ common.h
 
 
 ========
+extern.h
 
 
-Signals:
-Ctrl-Z = SIGTSTP
-Ctrl-C = SIGINT
-Child death = SIGCHILD
+========
+Source References:
+linux man pages at http://www.kernel.org/doc/man-pages/
+libc user manual at http://www.gnu.org/software/libc/manual/

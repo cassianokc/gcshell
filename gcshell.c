@@ -13,34 +13,35 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <fcntl.h>
-#include <setjmp.h>
-
 #include "common.h"
 
 struct JOB *jobs_list;
 struct JOB *cur_job;
-jmp_buf sjbuf;
-
 
 int main(int argc, char **argv) {
-    int count1;
+    int count1, result;
     char *input_string;
     size_t input_lenght;
     input_string = NULL;
     cur_job = NULL;
     set_signals();
-    for (count1 = 0; count1 < argc; count1++) { // Checks for shell call parameters.
+    setbuf(stdin, NULL);
+    setbuf(stdout, NULL);
+    for (count1 = 0; count1 < argc; count1++) { //Check for shell call parameters
         if (strcmp(argv[count1], "--help") == 0) {
             help();
         }
     }
     printf("$ ");
-    while (getlin(&input_string, &input_lenght, stdin) != FAILURE || !feof(stdin)) {
-        input_string[strlen(input_string) - 1] = '\0'; //Takes the \n from the string end. 
-        string_to_job(input_string, &cur_job); // Converts string to a job structure
+    while ((result = read_string(&input_string, &input_lenght, stdin)) != 0) {
+        if (result == -1) {
+            printf("\n$ ");
+            continue;
+        }
+        string_to_job(input_string, &cur_job); //Convert string to a job structure
         process_job(); // Process the input job.
-        delete_jobs(&cur_job); // Deletes it
-        printf("$ "); // Prompts user for another input.
+        delete_jobs(&cur_job); // Delete it
+        printf("$ ");
     }
     free(input_string);
     return EXIT_SUCCESS;
@@ -51,26 +52,32 @@ job passed. */
 void process_job() {
     int pid;
     pid = 0;
-    // Check for built-in commands, if found, execute it, frees input_arg and return to main loop
+    //Check for built-in commands, if found, execute it, frees input_arg and return to main loop
     if (check_builtin() == SUCCESS)
         return;
-    if (strcmp(cur_job->arg_strings[cur_job->num_args - 2], "&") == 0) {
-        cur_job->IS_FOREGROUND_FLAG = TRUE;
-        free(cur_job->arg_strings[cur_job->num_args - 2]);
-        cur_job->arg_strings[cur_job->num_args - 2] = NULL;
-        add_job(&jobs_list, cur_job);
-    }
     pid = fork();
     if (pid == -1)
-        if (cur_job->IS_FOREGROUND_FLAG)
-            fatal();
-    if (pid != 0) { // If parent
+        fatal();
+    if (pid != 0) { //If parent
         int status;
         cur_job->pid = pid;
+        if (strcmp(cur_job->arg_strings[cur_job->num_args - 2], "&") == 0) {
+            cur_job->IS_FOREGROUND_FLAG = FALSE;
+            free(cur_job->arg_strings[cur_job->num_args - 2]);
+            cur_job->arg_strings[cur_job->num_args - 2] = NULL;
+            cur_job->num_args--;
+            add_job(&jobs_list, cur_job);
+        }
         if (is_foreground(cur_job))
             wait(&status);
-        return;
     } else {
+        cur_job->pid = getpid();
+        if (strcmp(cur_job->arg_strings[cur_job->num_args - 2], "&") == 0) {
+            cur_job->IS_FOREGROUND_FLAG = FALSE;
+            free(cur_job->arg_strings[cur_job->num_args - 2]);
+            cur_job->arg_strings[cur_job->num_args - 2] = NULL;
+            cur_job->num_args--;
+        }
         execute(cur_job->arg_strings, cur_job->num_args);
     }
 }
@@ -80,10 +87,9 @@ the prompt.*/
 void execute(char **arg, int words) {
     int count1;
     if (is_foreground(cur_job)) {
-
     }
     for (count1 = 0; count1 < words - 1; count1++) {
-        if (strcmp(arg[count1], "|") == 0) { // Case found a pipe
+        if (strcmp(arg[count1], "|") == 0) { //Case found a pipe
             int pid;
             int pipefd[2];
             free(arg[count1]);
@@ -91,11 +97,11 @@ void execute(char **arg, int words) {
             count1++;
             if (pipe(pipefd) < 0)
                 fatal();
-            pid = fork(); // Fork
+            pid = fork(); //Fork
             if (pid == -1)
                 fatal();
             if (pid == 0) { //If child
-                close(STDOUT_DESC); // Redirect output and breaks to execute the first command
+                close(STDOUT_DESC); //Redirect output and breaks to execute the first command
                 dup(pipefd[1]);
                 close(pipefd[1]);
                 close(pipefd[0]);
@@ -145,7 +151,43 @@ void execute(char **arg, int words) {
         }
     }
     execvp(arg[0], arg);
-    printf("Command not found: %s\n", arg[0]); /* Execvp didn't executed correctly. */
+    printf("Command not found: %s\n", arg[0]); //Execvp didn't executed correctly
     exit(EXIT_FAILURE);
 }
 
+int read_string(char **string, size_t *n, FILE *file) {
+    int count1;
+    char *s;
+    ssize_t result;
+    size_t cur_size;
+    count1 = 0;
+    if (*string == NULL) {
+        cur_size = 50;
+        s = malloc(cur_size * sizeof (char));
+    } else {
+        s = *string;
+        cur_size = *n;
+    }
+    while (1) {
+        result = read(fileno(file), s + count1, 1);
+        if (result == -1) {
+            if (ferror(file) == EINTR)
+                clearerr(file);
+            return -1;
+
+        }
+        if (s[count1] == '\n' || result == 0) {
+            s[count1] = '\0';
+            *n = cur_size;
+            *string = s;
+            return count1 + result;
+        }
+        count1++;
+        if (count1 == cur_size) {
+            cur_size = cur_size + 50;
+            s = realloc(s, cur_size);
+            if (s == NULL)
+                return 0;
+        }
+    }
+}
