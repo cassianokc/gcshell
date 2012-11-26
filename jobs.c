@@ -128,6 +128,7 @@ void print_jobs(struct JOB *j) {
     }
 }
 
+/* Removes the first job in the list, sets its flags correctlys and returns it.*/
 struct JOB *wake_job(struct JOB **j, int foreground) {
     struct JOB *aux;
     aux = *j;
@@ -137,6 +138,8 @@ struct JOB *wake_job(struct JOB **j, int foreground) {
     return aux;
 }
 
+/* Test if a job with the same pid exists in a job list, if exists return TRUE,
+ otherwise return FALSE. */
 int job_exists(struct JOB *list, struct JOB *j) {
     struct JOB *aux;
     aux = list;

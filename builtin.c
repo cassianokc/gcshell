@@ -40,8 +40,10 @@ int check_builtin() {
             int status;
             delete_jobs(&cur_job);
             cur_job = wake_job(&jobs_list, TRUE);
-            if (cur_job != NULL)
+            if (cur_job != NULL) {
+                kill(cur_job->pid, SIGCONT);
                 wait(&status);
+            }
         }
         return SUCCESS;
     }

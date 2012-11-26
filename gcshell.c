@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
     input_string = NULL;
     cur_job = NULL;
     set_signals();
-    setbuf(stdin, NULL);
+    setbuf(stdin, NULL); // Make stdin/out streams unbuffereds.
     setbuf(stdout, NULL);
     for (count1 = 0; count1 < argc; count1++) { //Check for shell call parameters
         if (strcmp(argv[count1], "--help") == 0) {
@@ -69,7 +69,8 @@ void process_job() {
             add_job(&jobs_list, cur_job);
         }
         if (is_foreground(cur_job))
-            wait(&status);
+            waitpid(cur_job->pid, &status, 0);
+
     } else {
         cur_job->pid = getpid();
         if (strcmp(cur_job->arg_strings[cur_job->num_args - 2], "&") == 0) {
@@ -86,8 +87,6 @@ void process_job() {
 the prompt.*/
 void execute(char **arg, int words) {
     int count1;
-    if (is_foreground(cur_job)) {
-    }
     for (count1 = 0; count1 < words - 1; count1++) {
         if (strcmp(arg[count1], "|") == 0) { //Case found a pipe
             int pid;
@@ -171,7 +170,7 @@ int read_string(char **string, size_t *n, FILE *file) {
     while (1) {
         result = read(fileno(file), s + count1, 1);
         if (result == -1) {
-            if (ferror(file) == EINTR)
+            if (ferror(file) == EINTR || ECHILD)
                 clearerr(file);
             return -1;
 
@@ -190,4 +189,5 @@ int read_string(char **string, size_t *n, FILE *file) {
                 return 0;
         }
     }
+    clearerr(stderr);
 }

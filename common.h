@@ -23,7 +23,7 @@
 
 /* JOB structure, implemented as a linked list, where new members
  are added on the beginning of the list, contains flags indicating the state of 
- the job and the args used to create the job.*/
+ the job, process pid and the args used to create the job.*/
 struct JOB {
     struct JOB *next_job;
     char **arg_strings;
@@ -46,11 +46,8 @@ void process_job();
 void execute(char **, int);
 int check_builtin();
 void help(void);
-
 void set_signals(void);
-void dfl_signals(void);
 void handle_sigtstp(int);
-void handle_sigint(int);
 void handle_sigchld(int, siginfo_t *, void *);
 
 
