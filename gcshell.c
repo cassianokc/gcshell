@@ -34,10 +34,11 @@ int main(int argc, char **argv) {
     }
     printf("$ ");
     while ((result = read_string(&input_string, &input_lenght, stdin)) != 0) {
-        if (result == -1) {
+        if (result == -1 || strcmp(input_string, "") == 0) {
             printf("\n$ ");
             continue;
         }
+        
         string_to_job(input_string, &cur_job); //Convert string to a job structure
         process_job(); // Process the input job.
         delete_jobs(&cur_job); // Delete it

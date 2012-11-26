@@ -1,29 +1,35 @@
 ========
-Some explanation about the source code.
+Explicacao da estrutura do gcshell.
 ========
 gcshell.c
-
+Contém a funcao main(que chama as rotinas de iniciacao do shell), le a linha de 
+entrada do usuário e a processa.
 
 ========
 builtin.c
-
+Trata as funcoes built-in do shell(help exit jobs fg bg).
 
 ========
 jobs.c
+Contém as funcoes de gerenciamento de jobs do shell.
 
 
 ========
 signal.c
-
+Trata o handling de sinais do shell, sao tratados os sinais SIGINT, SIGTSTP e
+SIGCHLD.
 
 
 ========
 common.h
+Headers de todas as funcoes do shell, defines comuns e a estrutura de lista de
+jobs.
 
 
 ========
 extern.h
-
+Contém a declaracao de todas as variaveis globais(para que elas possam ser
+referenciadas em outros arquivos.
 
 ========
 Source References:

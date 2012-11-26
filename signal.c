@@ -51,7 +51,6 @@ void handle_sigchld(int s, siginfo_t *info, void *context) {
     pid_t pid;
     pid = info->si_pid;
     aux1 = jobs_list;
-    printf("blah");
     if (info->si_code == CLD_STOPPED || info->si_code == CLD_CONTINUED)
     {
         return;
